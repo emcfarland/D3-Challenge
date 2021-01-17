@@ -5,7 +5,7 @@ var svgHeight = 500;
 var margin = {
     top: 20,
     right: 40,
-    bottom: 80,
+    bottom: 100,
     left: 100
 };
 
@@ -68,8 +68,10 @@ function updateToolTip(chosenXAxis, circlesGroup) {
 
     if (chosenXAxis === "poverty") {
         xLabel = "In Poverty (%):";
-    } else {
+    } else if (chosenXAxis === "age") {
         xLabel = "Median Age:";
+    } else if (chosenXAxis === "income") {
+        xLabel = "Median Household Income:"
     }
 
     var yLabel = "Lacking Healthcare (%):";
@@ -102,6 +104,7 @@ d3.csv("assets/data/data.csv").then(function(censusData, err) {
     censusData.forEach(function(data) {
         data.poverty = +data.poverty;
         data.age = +data.age;
+        data.income = +data.income;
         data.healthcare = +data.healthcare;
     });
 
@@ -157,6 +160,14 @@ d3.csv("assets/data/data.csv").then(function(censusData, err) {
         .classed("inactive", true)
         .text("Median Age");
 
+    // Append income label
+    var incomeLabel = labelsGroup.append("text")
+        .attr("x", 0)
+        .attr("y", 60)
+        .attr("value", "income")
+        .classed("inactive", true)
+        .text("Median Household Income ($)");
+
     // Append y-axis label
     chartGroup.append("text")
         .attr("transform", "rotate(-90)")
@@ -186,20 +197,35 @@ d3.csv("assets/data/data.csv").then(function(censusData, err) {
 
                 // changes classes to change bold text
                 if (chosenXAxis === "age") {
-                  ageLabel
-                    .classed("active", true)
-                    .classed("inactive", false);
-                  povertyLabel
-                    .classed("active", false)
-                    .classed("inactive", true);
-                }
-                else {
-                  ageLabel
-                    .classed("active", false)
-                    .classed("inactive", true);
-                  povertyLabel
-                    .classed("active", true)
-                    .classed("inactive", false);
+                    ageLabel
+                        .classed("active", true)
+                        .classed("inactive", false);
+                    povertyLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                    incomeLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                } else if (chosenXAxis === "poverty") {
+                    ageLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                    povertyLabel
+                        .classed("active", true)
+                        .classed("inactive", false);
+                    incomeLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                } else if (chosenXAxis === "income") {
+                    ageLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                    povertyLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                    incomeLabel
+                        .classed("active", true)
+                        .classed("inactive", false);
                 }
 
             }
