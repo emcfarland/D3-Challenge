@@ -154,15 +154,6 @@ d3.csv("assets/data/data.csv").then(function(censusData, err) {
         .attr("r", 15)
         .attr("class", "stateCircle");
 
-    // var statesGroup = chartGroup.selectAll("div")
-    //     .data(censusData)
-    //     .enter()
-    //     .append("div")
-    //     .attr("x", d => xLinearScale(d[chosenXAxis]))
-    //     .attr("y", d => yLinearScale(d[chosenYAxis]))
-    //     .attr("class", "stateText")
-    //     .text(d => d.abbr);
-
 
     var xLabelsGroup = chartGroup.append("g")
         .attr("transform", `translate(${width / 2}, ${height + 20})`);
