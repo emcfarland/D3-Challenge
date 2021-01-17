@@ -29,34 +29,38 @@ var chosenXAxis = "poverty";
 var chosenYAxis = "healthcare";
 
 // Set scale of x-axis
-function xScale(censusData, chosenXAxis) {
+function axisScale(data, chosenAxis) {
 
-    var xLinearScale = d3.scaleLinear()
-        .domain([d3.min(censusData, d => d[chosenXAxis]) * 0.8,
-            d3.max(censusData, d => d[chosenXAxis]) * 1.2
-        ])
-        .range([0, width]);
+    var linearScale = d3.scaleLinear()
+        .domain([d3.min(data, d => d[chosenAxis]) * 0.8,
+            d3.max(data, d => d[chosenAxis]) * 1.2
+        ]);
 
-    return xLinearScale;
+    return linearScale;
 }
 
 // Set transition for changing x-axis label
-function renderAxes(newXScale, xAxis) {
+function renderAxes(newXScale, xAxis, newYScale, yAxis) {
     var bottomAxis = d3.axisBottom(newXScale);
-  
     xAxis.transition()
       .duration(1000)
       .call(bottomAxis);
+
+    var leftAxis = d3.axisLeft(newYScale);
+    yAxis.transition()
+      .duration(1000)
+      .call(leftAxis);
   
-    return xAxis;
+    return [xAxis, yAxis];
 }
 
 // Set circle transition
-function renderCircles(circlesGroup, newXScale, chosenXAxis) {
+function renderCircles(circlesGroup, newXScale, chosenXAxis, newYScale, chosenYAxis) {
 
     circlesGroup.transition()
     .duration(1000)
-    .attr("cx", d => newXScale(d[chosenXAxis]));
+    .attr("cx", d => newXScale(d[chosenXAxis]))
+    .attr("cy", d => newYScale(d[chosenYAxis]));
 
     return circlesGroup;
 }
@@ -114,16 +118,16 @@ d3.csv("assets/data/data.csv").then(function(censusData, err) {
         data.age = +data.age;
         data.income = +data.income;
         data.healthcare = +data.healthcare;
+        data.obesity = +data.obesity;
+        data.smokes = +data.smokes;
     });
 
     // Call xScale function
-    var xLinearScale = xScale(censusData, chosenXAxis);
+    var xLinearScale = axisScale(censusData, chosenXAxis)
+        .range([0, width]);
 
     // Create y-scale function
-    var yLinearScale = d3.scaleLinear()
-        .domain([d3.min(censusData, d => d[chosenYAxis])*0.8,
-            d3.max(censusData, d => d[chosenYAxis])*1.2
-        ])
+    var yLinearScale = axisScale(censusData, chosenYAxis)
         .range([height, 0]);
 
     // Create initial axis functions
@@ -177,6 +181,7 @@ d3.csv("assets/data/data.csv").then(function(censusData, err) {
         .classed("inactive", true)
         .text("Median Household Income ($)");
 
+
     // Append y-axis label
     var yLabelsGroup = chartGroup.append("g")
         .attr("transform", "rotate(-90)");
@@ -215,15 +220,17 @@ d3.csv("assets/data/data.csv").then(function(censusData, err) {
             if (value !== chosenXAxis) {
                 chosenXAxis = value;
 
-                xLinearScale = xScale(censusData, chosenXAxis);
+                xLinearScale = axisScale(censusData, chosenXAxis)
+                    .range([0, width]);
 
-                xAxis = renderAxes(xLinearScale, xAxis);
+                xAxis = renderAxes(xLinearScale, xAxis, yLinearScale, yAxis)[0];
+                yAxis = renderAxes(xLinearScale, xAxis, yLinearScale, yAxis)[1];
 
-                circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis);
+                circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis, yLinearScale, chosenYAxis);
 
                 circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
 
-                // changes classes to change bold text
+                // Change class based on active x-axis
                 if (chosenXAxis === "age") {
                     ageLabel
                         .classed("active", true)
@@ -254,6 +261,61 @@ d3.csv("assets/data/data.csv").then(function(censusData, err) {
                     incomeLabel
                         .classed("active", true)
                         .classed("inactive", false);
+                }
+
+            }
+        })
+
+    yLabelsGroup.selectAll("text")
+        .on("click", function() {
+            var value = d3.select(this).attr("value");
+            if (value !== chosenYAxis) {
+                chosenYAxis = value;
+
+                console.log(chosenYAxis);
+
+                yLinearScale = axisScale(censusData, chosenYAxis)
+                    .range([height, 0]);
+
+                xAxis = renderAxes(xLinearScale, xAxis, yLinearScale, yAxis)[0];
+                yAxis = renderAxes(xLinearScale, xAxis, yLinearScale, yAxis)[1];
+
+                circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis, yLinearScale, chosenYAxis);
+
+                circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
+
+                // Change class based on active y-axis
+                if (chosenYAxis === "obesity") {
+                    obesityLabel
+                        .classed("active", true)
+                        .classed("inactive", false);
+                    healthcareLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                    smokersLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                } else if (chosenYAxis === "smokes") {
+                    obesityLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                    healthcareLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                    smokersLabel
+                        .classed("active", true)
+                        .classed("inactive", false);
+                    
+                } else if (chosenYAxis === "healthcare") {
+                    obesityLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                    healthcareLabel
+                        .classed("active", true)
+                        .classed("inactive", false);
+                    smokersLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
                 }
 
             }
