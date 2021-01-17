@@ -152,7 +152,12 @@ d3.csv("assets/data/data.csv").then(function(censusData, err) {
         .attr("cx", d => xLinearScale(d[chosenXAxis]))
         .attr("cy", d => yLinearScale(d[chosenYAxis]))
         .attr("r", 15)
-        .attr("class", "stateCircle");
+        .attr("class", "stateCircle")
+    // // Attempts to add state abbreviations to each circle
+    //     .append("text")
+    //     .attr("class", "stateText")
+    //     .text(d => d.abbr)
+    ;
 
 
     var xLabelsGroup = chartGroup.append("g")
