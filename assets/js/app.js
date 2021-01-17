@@ -151,8 +151,18 @@ d3.csv("assets/data/data.csv").then(function(censusData, err) {
         .append("circle")
         .attr("cx", d => xLinearScale(d[chosenXAxis]))
         .attr("cy", d => yLinearScale(d[chosenYAxis]))
-        .attr("r", 20)
+        .attr("r", 15)
         .attr("class", "stateCircle");
+
+    // var statesGroup = chartGroup.selectAll("div")
+    //     .data(censusData)
+    //     .enter()
+    //     .append("div")
+    //     .attr("x", d => xLinearScale(d[chosenXAxis]))
+    //     .attr("y", d => yLinearScale(d[chosenYAxis]))
+    //     .attr("class", "stateText")
+    //     .text(d => d.abbr);
+
 
     var xLabelsGroup = chartGroup.append("g")
         .attr("transform", `translate(${width / 2}, ${height + 20})`);
@@ -241,6 +251,7 @@ d3.csv("assets/data/data.csv").then(function(censusData, err) {
                     incomeLabel
                         .classed("active", false)
                         .classed("inactive", true);
+
                 } else if (chosenXAxis === "poverty") {
                     ageLabel
                         .classed("active", false)
@@ -251,6 +262,7 @@ d3.csv("assets/data/data.csv").then(function(censusData, err) {
                     incomeLabel
                         .classed("active", false)
                         .classed("inactive", true);
+
                 } else if (chosenXAxis === "income") {
                     ageLabel
                         .classed("active", false)
@@ -262,7 +274,6 @@ d3.csv("assets/data/data.csv").then(function(censusData, err) {
                         .classed("active", true)
                         .classed("inactive", false);
                 }
-
             }
         })
 
@@ -271,8 +282,6 @@ d3.csv("assets/data/data.csv").then(function(censusData, err) {
             var value = d3.select(this).attr("value");
             if (value !== chosenYAxis) {
                 chosenYAxis = value;
-
-                console.log(chosenYAxis);
 
                 yLinearScale = axisScale(censusData, chosenYAxis)
                     .range([height, 0]);
@@ -295,6 +304,7 @@ d3.csv("assets/data/data.csv").then(function(censusData, err) {
                     smokersLabel
                         .classed("active", false)
                         .classed("inactive", true);
+
                 } else if (chosenYAxis === "smokes") {
                     obesityLabel
                         .classed("active", false)
@@ -317,7 +327,6 @@ d3.csv("assets/data/data.csv").then(function(censusData, err) {
                         .classed("active", false)
                         .classed("inactive", true);
                 }
-
             }
         })
 
